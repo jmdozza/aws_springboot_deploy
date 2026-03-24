@@ -1,0 +1,75 @@
+#Esto es una receta donde le decimos a github como automatizar nuestro despliegue
+name: Deploy to Amazon EC2
+
+on:
+  push:
+    branches: [ "main" ] # Se activa cuando subes algo a la rama main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest #Creamos una maquina virtual temporal (esta maquina es de github)
+
+    steps:
+    #Este paso entra al repo y descarga el codigo fuente para que podamos trabajar con el
+    - name: Checkout del código
+      uses: actions/checkout@v3
+
+    #Este paso instala Java 21 en la maquina
+    - name: Configurar Java
+      uses: actions/setup-java@v3
+      with:
+        java-version: '21' 
+        distribution: 'temurin'
+        #El cache es un truco para que las futturas ejecuciones sean mas rapidas
+        #guardando las dependencias que ya antes descargamos
+        cache: maven
+
+    #Maven limpia los proyectos y empaquete el codigo en un .jar,
+    #como estos es un codigo de ejemplo vamos a skipear los tests
+    - name: Construir con Maven
+      run: mvn clean package -DskipTests
+
+
+    - name: Congifurar credenciales de AWS
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+
+    - name: Encender la instancia EC2
+      run: |
+                echo "Encendiendo la instancia EC2..."
+                aws ec2 start-instances --instance-ids ${{ secrets.EC2_INSTANCE_ID }}
+                # Esperar a que la instancia esté en estado "running"
+                aws ec2 wait instance-status-ok --instance-ids ${{ secrets.EC2_INSTANCE_ID }}
+    
+    - name: Obtener la IP pública de la instancia EC2
+      id: get_ip
+      run: |
+        echo "Obteniendo la IP pública de la instancia EC2..."
+        NUEVA_IP=$(aws ec2 describe-instances --instance-ids ${{ secrets.EC2_INSTANCE_ID }} --query "Reservations[0].Instances[0].PublicIpAddress" --output text)
+        echo "EC2_PUBLIC_IP=$NUEVA_IP" >> $GITHUB_ENV
+
+
+    - name: Copiar JAR a EC2 vía SCP
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ env.EC2_PUBLIC_IP }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        source: "target/*.jar"
+        target: "/home/${{ secrets.EC2_USER }}/"
+        strip_components: 1
+
+    #Acá levantamos la nueva versión de la API, matando el proceso anterior y lanzando el nuevo
+    - name: Reiniciar API por SSH
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ env.EC2_PUBLIC_IP }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          # Aquí matamos el proceso anterior y lanzamos el nuevo
+          # Si usas Systemd, es mucho más limpio:
+          sudo systemctl restart mi-api.service
