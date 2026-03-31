@@ -1,12 +1,9 @@
 package com.aws.ec2java.domain.ports;
 
-import java.util.List;
 import java.util.Optional;
 
 import com.aws.ec2java.domain.models.Artist;
 
-public interface ArtistRepositoryPort {
-    Artist insertArtist(Artist newArtist);
-    List<Artist> getAllArtists();
+public interface GetArtistsUseCase {
     Optional<Artist> getArtist(String name);
 }

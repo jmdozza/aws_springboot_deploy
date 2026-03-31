@@ -4,7 +4,9 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -14,6 +16,7 @@ import com.aws.ec2java.infraestructure.DTO.request.ArtistRequest;
 import com.aws.ec2java.infraestructure.DTO.response.ArtistResponse;
 import com.aws.ec2java.infraestructure.mappers.ArtistMapper;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RestController
 @RequestMapping("/api/v1/aws")
 @AllArgsConstructor
+@Validated
 public class SampleController {
 
     private final ArtistService artistService;
@@ -34,9 +38,15 @@ public class SampleController {
     }   
 
     @PostMapping
-    public ResponseEntity<ArtistResponse> postMethodName(@RequestBody ArtistRequest newArt) {
+    public ResponseEntity<ArtistResponse> createArtist(@RequestBody ArtistRequest newArt) {
         Artist createdArtist= artistService.createArtist(artistMapper.toDomain(newArt));
         return ResponseEntity.status(HttpStatus.CREATED).body(artistMapper.toResponse(createdArtist));
+    }
+
+    @GetMapping("/{name}")
+    public ResponseEntity<ArtistResponse> getArtist(@PathVariable @NotBlank String name) {
+        Artist artist = artistService.getArtist(name).get();
+        return ResponseEntity.ok(artistMapper.toResponse(artist));
     }
     
 }

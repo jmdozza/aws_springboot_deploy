@@ -1,6 +1,7 @@
 package com.aws.ec2java.infraestructure.repositories;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
@@ -27,6 +28,11 @@ public class JpaArtistRepositoryAdapter implements ArtistRepositoryPort {
     public List<Artist> getAllArtists() {
         List<ArtistEntity> artists= jpaArtistRepository.findAll();
         return  artists.stream().map(artistMapper::toDomain).toList();
+    }
+
+    @Override
+    public Optional<Artist> getArtist(String name) {
+        return jpaArtistRepository.findByArtisticnameContaining(name).map(artistMapper::toDomain);
     }
     
 }
