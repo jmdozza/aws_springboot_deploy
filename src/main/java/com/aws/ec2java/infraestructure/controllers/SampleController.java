@@ -1,5 +1,7 @@
 package com.aws.ec2java.infraestructure.controllers;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,8 +28,9 @@ public class SampleController {
     private final ArtistMapper artistMapper;
     
     @GetMapping
-    public ResponseEntity<String> getMethodName() {
-        return ResponseEntity.ok("Hello Aws World, this is a get response");
+    public ResponseEntity<List<ArtistResponse>> getClients() {
+        List<ArtistResponse> artists= artistService.getAllArtists().stream().map(artistMapper::toResponse).toList();
+        return ResponseEntity.ok(artists);
     }   
 
     @PostMapping

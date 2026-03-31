@@ -41,7 +41,7 @@ jobs:
       run: |
                 echo "Encendiendo la instancia EC2..."
                 aws ec2 start-instances --instance-ids ${{ secrets.EC2_INSTANCE_ID }}
-                # Esperar a que la instancia esté en estado "running"
+                # Esperarmos a que la instancia esté en estado "running"
                 aws ec2 wait instance-status-ok --instance-ids ${{ secrets.EC2_INSTANCE_ID }}
     
     - name: Obtener la IP pública de la instancia EC2
@@ -71,5 +71,4 @@ jobs:
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
           # Aquí matamos el proceso anterior y lanzamos el nuevo
-          # Si usas Systemd, es mucho más limpio:
           sudo systemctl restart mi-api.service
