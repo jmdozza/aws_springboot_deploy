@@ -4,8 +4,7 @@ import java.util.UUID;
 
 public record Artist(
     UUID uuid,
-    String name,
-    String artisticname,
-    int age
+    String artistic_name,
+    Boolean isGroup
 ) {
 }

@@ -1,9 +1,11 @@
 package com.aws.ec2java.infraestructure.DTO.response;
 
+import java.util.UUID;
+
 public record ArtistResponse(
-    String name,
-    String artisticname,
-    String age
+    UUID id,
+    String artistic_name,
+    Boolean isGroup
 ) {
     
 }

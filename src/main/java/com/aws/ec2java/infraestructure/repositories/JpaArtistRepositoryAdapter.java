@@ -2,11 +2,12 @@ package com.aws.ec2java.infraestructure.repositories;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 
 import com.aws.ec2java.domain.models.Artist;
-import com.aws.ec2java.domain.ports.ArtistRepositoryPort;
+import com.aws.ec2java.domain.ports.artist.ArtistRepositoryPort;
 import com.aws.ec2java.infraestructure.entitys.ArtistEntity;
 import com.aws.ec2java.infraestructure.mappers.ArtistMapper;
 
@@ -33,6 +34,11 @@ public class JpaArtistRepositoryAdapter implements ArtistRepositoryPort {
     @Override
     public Optional<Artist> getArtist(String name) {
         return jpaArtistRepository.findByArtisticnameContaining(name).map(artistMapper::toDomain);
+    }
+
+    @Override
+    public Optional<Artist> getArtistById(UUID id) {
+        return jpaArtistRepository.findById(id).map(artistMapper::toDomain);
     }
     
 }

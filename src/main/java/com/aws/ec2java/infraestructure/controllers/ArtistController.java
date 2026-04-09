@@ -16,6 +16,7 @@ import com.aws.ec2java.infraestructure.DTO.request.ArtistRequest;
 import com.aws.ec2java.infraestructure.DTO.response.ArtistResponse;
 import com.aws.ec2java.infraestructure.mappers.ArtistMapper;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 
@@ -23,10 +24,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
-@RequestMapping("/api/v1/aws")
+@RequestMapping("/api/v1/artist")
 @AllArgsConstructor
 @Validated
-public class SampleController {
+public class ArtistController {
 
     private final ArtistService artistService;
     private final ArtistMapper artistMapper;
@@ -38,7 +39,7 @@ public class SampleController {
     }   
 
     @PostMapping
-    public ResponseEntity<ArtistResponse> createArtist(@RequestBody ArtistRequest newArt) {
+    public ResponseEntity<ArtistResponse> createArtist(@Valid @RequestBody ArtistRequest newArt) {
         Artist createdArtist= artistService.createArtist(artistMapper.toDomain(newArt));
         return ResponseEntity.status(HttpStatus.CREATED).body(artistMapper.toResponse(createdArtist));
     }

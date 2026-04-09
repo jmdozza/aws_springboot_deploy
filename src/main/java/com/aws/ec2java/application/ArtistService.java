@@ -4,12 +4,11 @@ import java.util.List;
 import java.util.Optional;
 
 import com.aws.ec2java.domain.models.Artist;
-import com.aws.ec2java.domain.ports.ArtistRepositoryPort;
-import com.aws.ec2java.domain.ports.CreateArtistUseCase;
-import com.aws.ec2java.domain.ports.GetAllArtistsUseCase;
-import com.aws.ec2java.domain.ports.GetArtistsUseCase;
+import com.aws.ec2java.domain.ports.artist.ArtistRepositoryPort;
+import com.aws.ec2java.domain.ports.artist.ArtistUseCases;
 
-public class ArtistService implements CreateArtistUseCase, GetAllArtistsUseCase, GetArtistsUseCase{
+
+public class ArtistService implements ArtistUseCases{
     private final ArtistRepositoryPort artistRepo;
 
     public ArtistService(ArtistRepositoryPort artRepo){
